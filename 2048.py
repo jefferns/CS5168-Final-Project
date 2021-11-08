@@ -3,6 +3,7 @@ import random
 import sys
 
 from math import floor
+from pygame.locals import *
 
 
 pygame.init()
@@ -14,7 +15,6 @@ T_DIM = 4
 surface = pygame.display.set_mode((HEIGHT,WIDTH),0,32)  # width, height, flags, depth (bits per pixel)
 pygame.display.set_caption("2048")   # Title on the popup window
 
-
 font = pygame.font.SysFont("monospace",40)
 fontofscore = pygame.font.SysFont("monospace",30)
 
@@ -22,7 +22,8 @@ tiles = [[0,0,0,0],  # Holds values of tiles on the board
          [0,0,0,0],
          [0,0,0,0],
          [0,0,0,0]]
-undomatrix = []
+
+score = 0
 
 colors = {
     0:   (255,255,255),
@@ -30,27 +31,27 @@ colors = {
     4:   (255,238,153),
     8:   (156,39,176),
     16:  (103,58,183),
-    32:  (255,87,34),
-    64:  (0,150,136),
-    128: (139,195,74),
-    256: (234,30,99),
-    512: (255,152,0),
-    1024:(0,0,0),
-    2048:(121,85,72),
+    32:  (246,124,95),
+    64:  (246,94,59),
+    128: (237,204,114),
+    256: (237,204,97),
+    512: (187,173,160),
+    1024:(237,197,65),
+    2048:(255,61,63),
 }
 
 ####################################################
 #                   Summation                      #
 ####################################################
-def mergetiles():
+def mergetiles(score):
     for x in range(T_DIM):
         for y in range(T_DIM-1):
             if tiles[x][y] == tiles[x][y+1] and tiles[x][y] != 0:
                 tiles[x][y] = tiles[x][y]*2
                 tiles[x][y+1] = 0 
-                # points += tiles[x][y]
+                score += tiles[x][y]
                 moveTiles()
-
+    return score
 
 ####################################################
 #                   Move Tiles                     #
@@ -112,11 +113,15 @@ def canMove():
 #                   Random Tile                    #
 ####################################################
 def addRandomTile(depth=0):
-    a,b = random.randint(0,T_DIM-1),random.randint(0,T_DIM-1)
+    # At a higher score, random tile can be 2 or 4
+    rand_tile = 2*random.randint(1,2) if score >= 100 else 2
+
+    # Pick a random location, 
+    a,b = random.randint(0,T_DIM-1),random.randint(0,T_DIM-1)   
     if not tiles[a][b]:
-        tiles[a][b] = 2
+        tiles[a][b] = rand_tile
         return True
-    elif depth == 16:
+    elif depth == 30:
         return False
     addRandomTile(depth+1)
 
@@ -151,68 +156,71 @@ def printBoard():
             if tiles[i][j]:
                 label = font.render(str(tiles[i][j]),1,(94,94,94))
                 surface.blit(label,((i*T_HEIGHT)+T_HEIGHT//2,j*(T_WIDTH)+ T_WIDTH//2))
-dw
-            # label2 = fontofscore.render("YourScore:"+str(score),1,(255,255,255))
-    return
 
 
 ####################################################
 #                     MAIN LOOP                    #
 ####################################################
-addRandomTile()
-addRandomTile()
+def game():
+    addRandomTile()
+    addRandomTile()
+    score = 0
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                # Close window if someone clicks the X
+                pygame.quit()
+                sys.exit()
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            # Close window if someone clicks the X
-            pygame.quit()
-            sys.exit()
+            if checkIfCanGo() == True:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        for _ in range(3):
+                            rotate()
+                        if canMove():
+                            moveTiles()
+                            score = mergetiles(score)
+                            addRandomTile()
+                        for _ in range(1):
+                            rotate()
+                        print('right')
+                    elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        for _ in range(1):
+                            rotate()
+                        if canMove():
+                            moveTiles()
+                            score = mergetiles(score)
+                            addRandomTile()
+                        for _ in range(3):
+                            rotate()
+                        print('left')
+                    elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                        for _ in range(0):
+                            rotate()
+                        if canMove():
+                            moveTiles()
+                            score = mergetiles(score)
+                            addRandomTile()
+                        for _ in range(4):
+                            rotate()
+                        print('up')
+                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                        for _ in range(2):
+                            rotate()
+                        if canMove():
+                            moveTiles()
+                            score = mergetiles(score)
+                            addRandomTile()
+                        for _ in range(2):
+                            rotate()
+                        print('down')
+            else:
+                print("You lose")
+                pygame.quit()
+                return score
 
-        if checkIfCanGo() == True:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    for _ in range(3):
-                        rotate()
-                    if canMove():
-                        moveTiles()
-                        mergetiles()
-                    for _ in range(1):
-                        rotate()
-                    print('right')
-                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    for _ in range(1):
-                        rotate()
-                    if canMove():
-                        moveTiles()
-                        mergetiles()
-                    for _ in range(3):
-                        rotate()
-                    print('left')
-                elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                    for _ in range(0):
-                        rotate()
-                    if canMove():
-                        moveTiles()
-                        mergetiles()
-                    for _ in range(4):
-                        rotate()
-                    print('up')
-                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    for _ in range(2):
-                        rotate()
-                    if canMove():
-                        moveTiles()
-                        mergetiles()
-                    for _ in range(2):
-                        rotate()
-                    print('down')
-                addRandomTile()
-        else:
-            print("You lose")
-            gameover()
-            pygame.quit()
+            printBoard()
+            pygame.display.update()
 
-
-        printBoard()
-        pygame.display.update()
+test = game()
+print("Score: ", test)
