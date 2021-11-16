@@ -48,14 +48,14 @@ def initial_population():
             accepted_scores.append(score)
 
             for data in game_memory:
-                if data[1] == 1:
-                    output = [0,1,0,0]
-                elif data[1] == 0:
-                    output = [1,0,0,0]
+                if data[1] == 0:
+                    output = 0
+                elif data[1] == 1:
+                    output = 1
                 elif data[1] == 2:
-                    output = [0,0,1,0]
+                    output = 2
                 elif data[1] == 3:
-                    output = [0,0,0,1]
+                    output = 3
 
                 training_data.append([data[0], output])
         env.reset() #reset the game
