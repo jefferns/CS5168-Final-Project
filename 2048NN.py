@@ -61,7 +61,7 @@ def initial_population():
         env.reset() #reset the game
         scores.append(score)
 
-    training_data_save = np.array(training_data)
+    training_data_save = np.array(training_data) ### current error
     np.save('saved.npy', training_data_save)
 
     print('Average Accepted Score: ', mean(accepted_scores))
