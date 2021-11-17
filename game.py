@@ -110,7 +110,7 @@ def game():
     addRandomTile()
     score = 0
     while True:
-        move_input = input(str('Input move'))
+        move_input = int(input('Input move'))
         if checkIfCanGo() == True:
             if move_input == 0:
                 for _ in range(3):
