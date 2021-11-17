@@ -111,6 +111,10 @@ def game():
     score = 0
     while True:
         move_input = int(input('Input move'))
+        #   RIGHT == 0
+        #   LEFT  == 1
+        #   UP    == 2
+        #   DOWN  == 3
         if checkIfCanGo() == True:
             if move_input == 0:
                 for _ in range(3):
