@@ -1,22 +1,11 @@
-import pygame
 import random
 import sys
-
 from math import floor
-from pygame.locals import *
 
-
-pygame.init()
 
 HEIGHT, WIDTH = 600,600
 T_HEIGHT, T_WIDTH = HEIGHT//4, WIDTH//4
 T_DIM = 4
-
-surface = pygame.display.set_mode((HEIGHT,WIDTH),0,32)  # width, height, flags, depth (bits per pixel)
-pygame.display.set_caption("2048")   # Title on the popup window
-
-font = pygame.font.SysFont("monospace",40)
-fontofscore = pygame.font.SysFont("monospace",30)
 
 tiles = [[0,0,0,0],  # Holds values of tiles on the board
          [0,0,0,0],
@@ -25,20 +14,6 @@ tiles = [[0,0,0,0],  # Holds values of tiles on the board
 
 score = 0
 
-colors = {
-    0:   (255,255,255),
-    2:   (255,247,204),
-    4:   (255,238,153),
-    8:   (242,177,121),
-    16:  (245,149,99),
-    32:  (246,124,95),
-    64:  (246,94,59),
-    128: (237,204,114),
-    256: (237,204,97),
-    512: (187,173,160),
-    1024:(237,197,65),
-    2048:(255,61,63),
-}
 
 ####################################################
 #                   Summation                      #
@@ -126,38 +101,6 @@ def addRandomTile(depth=0):
     addRandomTile(depth+1)
 
 
-
-####################################################
-#                     GameOver                     #
-####################################################
-def gameover():
-    surface.fill((0,0,0))
-
-    label = font.render("gameover",1,(255,255,255))
-
-    surface.blit(label,(50,100))
-    pygame.display.update()
-
-
-####################################################
-#                    Print Board                   #
-####################################################
-def printBoard():
-    border = 2
-    surface.fill((240,240,240))
-
-    for i in range(T_DIM):
-        for j in range(T_DIM):
-            # Draw a rectangle on 'surface' with color based on tile value
-            # Third Arg: (top left x, top left y, width, height)
-            pygame.draw.rect(surface, colors[tiles[i][j]], (i*T_HEIGHT+i*border, j*T_WIDTH+j*border, T_HEIGHT-2*border, T_WIDTH-2*border))
-
-            # Label for Tile Values
-            if tiles[i][j]:
-                label = font.render(str(tiles[i][j]),1,(94,94,94))
-                surface.blit(label,((i*T_HEIGHT)+T_HEIGHT//2,j*(T_WIDTH)+ T_WIDTH//2))
-
-
 ####################################################
 #                     MAIN LOOP                    #
 ####################################################
@@ -166,15 +109,9 @@ def game():
     addRandomTile()
     score = 0
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                # Close window if someone clicks the X
-                pygame.quit()
-                sys.exit()
-
             if checkIfCanGo() == True:
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    if ait:
                         for _ in range(3):
                             rotate()
                         if canMove():
