@@ -10,10 +10,6 @@ from collections import Counter
 
 learningRate = 1e-3
 
-##env is the game environment
-##This will be changed to 2048
-env = gym.make("2048-v0")
-env.reset()
 
 #Will need to change these for 2048
 goal_score = 500
@@ -27,42 +23,24 @@ def initial_population():
     accepted_scores = []
 
     for _ in range(initial_games):
-        score = 0
-        game_memory = []
-        prev_observation = []
+        env = gym.make('2048-v0')
+        env.reset()
+        env.render()
+        done = False
+        moves = 0
+        while not done:
+            action = env.np_random.choice(range(4), 1).item()
+            next_state, reward, done, info = env.step(action)
+            moves += 1
 
-        for _ in range(goal_score):
-            action = random.randrange(0,4) #will need to be (0,4) for 2048?
-            game_data, reward, done, info = env.step(action) #controls the game
+            print('Next Action: "{}"\n\nReward: {}'.format(
+            gym_2048.Base2048Env.ACTION_STRING[action], reward))
+            env.render()
 
-            if len(prev_observation) > 0:
-                game_memory.append([prev_observation, action])
+        print('\nTotal Moves: {}'.format(moves))
 
-            prev_observation = game_data
-            score += reward
-            
-            if done:
-                break
-
-        if score >= score_required:
-            accepted_scores.append(score)
-
-            for data in game_memory:
-                if data[1] == 0:
-                    output = 0
-                elif data[1] == 1:
-                    output = 1
-                elif data[1] == 2:
-                    output = 2
-                elif data[1] == 3:
-                    output = 3
-
-                training_data.append([data[0], output])
-        env.reset() #reset the game
-        scores.append(score)
-
-    training_data_save = np.array(training_data) ### current error
-    np.save('saved.npy', training_data_save)
+    #training_data_save = np.array(training_data) ### current error
+    #np.save('saved.npy', training_data_save)
 
     print('Average Accepted Score: ', mean(accepted_scores))
     print('Median Accepted Score: ', median(accepted_scores))
@@ -123,25 +101,20 @@ for eachGame in range(10):
     game_memory = []
     prev_obs = []
     env.reset() #reset the game
+    env.render()
+    done = False
+    moves = 0
 
-    for _ in range(goal_score):
-        env.render() #show the game
-        if len(prev_obs) == 0:
-            action = random.randrange(0,4) #4
-        else:
-            action = np.argmax(model.predict(prev_obs.reshape(-1, len(prev_obs), 1))[0])
+    while not done:
+        action = env.np_random.choice(range(4), 1).item()
+        next_state, reward, done, info = env.step(action)
+        moves += 1
 
-        choices.append(action)
+        print('Next Action: "{}"\n\nReward: {}'.format(
+        gym_2048.Base2048Env.ACTION_STRING[action], reward))
+        env.render()
 
-        newObs, reward, done, info = env.step(action) #this is what gets the game info, will need to be chaged to fit 2048
-        prev_obs = newObs
-        game_memory.append([newObs, action])
-        score += reward
+   #print('\nTotal Moves: {}'.format(moves))
 
-        if done:
-            break
-
-    scores.append(score)
-
-print("average score: ", sum(scores)/len(scores))
-print("Choice 1: {}, Choice 2: {}".format(choices.count(1)/len(choices), choices.count(0)/len(choices)))
+#print("average score: ", sum(scores)/len(scores))
+#print("Choice 1: {}, Choice 2: {}".format(choices.count(1)/len(choices), choices.count(0)/len(choices)))
