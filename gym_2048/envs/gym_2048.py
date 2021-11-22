@@ -98,7 +98,7 @@ class Game2048Env(gym.Env):
         except IllegalMove:
             logging.debug("Illegal move")
             info['illegal_move'] = True
-            done = True
+            #done = True
             reward = self.illegal_move_reward
             
         info['highest'] = self.highest()
@@ -196,21 +196,33 @@ class Game2048Env(gym.Env):
         """Perform one move of the game. Shift things to one side then,
         combine. directions 0, 1, 2, 3 are up, right, down, left.
         Returns the score that [would have] got."""
+        direct = 0     
+
+        if direction == [1,0,0,0]:
+                direct = 0
+        elif direction == [0,1,0,0]:
+                direct = 1
+        elif direction == [0,0,1,0]:
+                direct = 2
+        elif direction == [0,0,0,1]:
+                direct = 3
+
         if not trial:
-            if direction == 0:
+            if direction == [1,0,0,0]:
                 logging.debug("Up")
-            elif direction == 1:
+            elif direction == [0,1,0,0]:
                 logging.debug("Right")
-            elif direction == 2:
+            elif direction == [0,0,1,0]:
                 logging.debug("Down")
-            elif direction == 3:
+            elif direction == [0,0,0,1]:
                 logging.debug("Left")
 
         changed = False
         move_score = 0
-        dir_div_two = int(direction / 2)
-        dir_mod_two = int(direction % 2)
+        dir_div_two = int(direct / 2) #L/R
+        dir_mod_two = int(direct % 2) #U/D
         shift_direction = dir_mod_two ^ dir_div_two # 0 for towards up left, 1 for towards bottom right
+
 
         # Construct a range for extracting row/column into a list
         rx = list(range(self.w))
@@ -293,12 +305,14 @@ class Game2048Env(gym.Env):
            or there are no legal moves. If there are empty spaces then there
            must be legal moves."""
 
+        direct = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
+
         if self.max_tile is not None and self.highest() == self.max_tile:
             return True
 
         for direction in range(4):
             try:
-                self.move(direction, trial=True)
+                self.move(direct[direction], trial=True)
                 # Not the end if we can do any move
                 return False
             except IllegalMove:
