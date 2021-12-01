@@ -89,7 +89,7 @@ def initial_population():
 #Create a NN model using tensorflow and tflearn
 def neuralNetworkModel(input_size):
     #input layer
-    network = input_data(shape=[None, input_size, 1], name='input')
+    network = input_data(shape=[None, input_size], name='input')
 
     #5 layers
     network = fully_connected(network, 128, activation='relu')
@@ -112,7 +112,7 @@ def neuralNetworkModel(input_size):
     network = regression(network, optimizer='adam', learning_rate=learningRate,
                          loss='categorical_crossentropy', name='targets')
     
-    model = tflearn.DNN(network, tensorboard_dir='log')
+    model = tflearn.models.dnn.DNN(network, tensorboard_dir='log')
 
     return model
 
@@ -135,7 +135,7 @@ def train_model(trainingData, model=False):
     #     print('******')
     #     print(condense_board(x[0]))
 #   X = np.array([i[0] for i in training_data]).reshape(-1,len(training_data[0][0]),1)
-    X = np.array([i[0] for i in trainingData]).reshape(len(trainingData),4,4)
+    X = np.array([i[0] for i in trainingData]).reshape(len(trainingData),16gym)
     #print("Type: " ,type(X[0]))
     print("X Shape: ", X.shape)
     #print(Y)
@@ -164,18 +164,23 @@ for eachGame in range(10):
     score = 0
     game_memory = []
     prev_obs = []
-    env.reset() #reset the game
+    env.reset() #reset the game\
+    moves = [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]]
 
     for _ in range(goal_score):
         env.render() #show the game
         if len(prev_obs) == 0:
-            action = random.randrange(0,4) #4
+            action = moves[random.randrange(0,4)] #4
         else: 
-            action = np.argmax(model.predict(prev_obs.reshape(-1, len(prev_obs), 1))[0])
+            print("LEN OF PrevOBS: ", len(prev_obs))
+            action = moves[np.argmax(model.predict(prev_obs)[0])]
+        
+        print("ACTION:", action)
 
         choices.append(action)
 
         newObs, reward, done, info = env.step(action) #this is what gets the game info, will need to be chaged to fit 2048
+        print("NEWOBS: \n", newObs)
         prev_obs = newObs
         game_memory.append([newObs, action])
         score += reward

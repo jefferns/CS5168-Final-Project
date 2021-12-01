@@ -45,7 +45,7 @@ class Game2048Env(gym.Env):
         self.score = 0
         
         #members for gym implementation
-        self.action_space = spaces.Discrete(4)
+        self.action_space = spaces.Discrete(2)
         
         layers = self.squares
         self.observation_space = spaces.Box(0,1, (self.w, self.h, layers), dtype=int)
@@ -81,6 +81,7 @@ class Game2048Env(gym.Env):
         
     #implement gym interface
     def step(self, action):
+        #print(action)
         """Perform one step of the game. This involves moving and adding a new tile."""
         logging.debug("Action {}".format(action))
         score = 0
@@ -103,7 +104,7 @@ class Game2048Env(gym.Env):
             
         info['highest'] = self.highest()
         
-        return stack(self.Matrix), reward, done, info
+        return self.Matrix, reward, done, info
     
     def reset(self):
         self.Matrix = np.zeros((self.h, self.w), int)
@@ -113,7 +114,7 @@ class Game2048Env(gym.Env):
         self.add_tile()
         self.add_tile()
 
-        return stack(self.Matrix)
+        return self.Matrix
     
     def render(self, mode='human'):
         if mode == 'rgb_array':
@@ -196,31 +197,31 @@ class Game2048Env(gym.Env):
         """Perform one move of the game. Shift things to one side then,
         combine. directions 0, 1, 2, 3 are up, right, down, left.
         Returns the score that [would have] got."""
-        direct = 0     
+        # direct = 0     
 
-        if direction == [1,0,0,0]:
-                direct = 0
-        elif direction == [0,1,0,0]:
-                direct = 1
-        elif direction == [0,0,1,0]:
-                direct = 2
-        elif direction == [0,0,0,1]:
-                direct = 3
+        # if direction == [1,0,0,0]:
+        #         direct = 0
+        # elif direction == [0,1,0,0]:
+        #         direct = 1
+        # elif direction == [0,0,1,0]:
+        #         direct = 2
+        # elif direction == [0,0,0,1]:
+        #         direct = 3
 
         if not trial:
-            if direction == [1,0,0,0]:
+            if direction == 0:
                 logging.debug("Up")
-            elif direction == [0,1,0,0]:
+            elif direction == 1:
                 logging.debug("Right")
-            elif direction == [0,0,1,0]:
+            elif direction == 2:
                 logging.debug("Down")
-            elif direction == [0,0,0,1]:
+            elif direction == 3:
                 logging.debug("Left")
 
         changed = False
         move_score = 0
-        dir_div_two = int(direct / 2) #L/R
-        dir_mod_two = int(direct % 2) #U/D
+        dir_div_two = int(direction / 2) #L/R
+        dir_mod_two = int(direction % 2) #U/D
         shift_direction = dir_mod_two ^ dir_div_two # 0 for towards up left, 1 for towards bottom right
 
 
@@ -305,14 +306,14 @@ class Game2048Env(gym.Env):
            or there are no legal moves. If there are empty spaces then there
            must be legal moves."""
 
-        direct = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
+       # direct = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
 
         if self.max_tile is not None and self.highest() == self.max_tile:
             return True
 
         for direction in range(4):
             try:
-                self.move(direct[direction], trial=True)
+                self.move(direction, trial=True)
                 # Not the end if we can do any move
                 return False
             except IllegalMove:
