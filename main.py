@@ -20,10 +20,12 @@ def plot_learning_curve(x, scores, figure_file):
     plt.savefig(figure_file)
 
 pid_list = []
+pid = 0
 for _ in range(CHILD_COUNT):
-    n = os.fork()
-    pid = os.getpid()
-    pid_list += [pid]
+    if pid == 0:
+        n = os.fork()
+        pid = os.getpid()
+        pid_list += [pid]
 
 if pid > 0:
     # ONLY CHILDREN RUN HERE
