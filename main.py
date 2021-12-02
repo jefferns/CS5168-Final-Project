@@ -58,7 +58,7 @@ if pid > 0:
     plot_learning_curve(x, score_history, figure_file)
     
     print(f"Child #{pid} stopping...")
-    
+    exit(1)
 
 
 else:
