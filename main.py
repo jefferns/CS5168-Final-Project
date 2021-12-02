@@ -26,8 +26,6 @@ for _ in range(CHILD_COUNT):
         n = os.fork()
         pid = os.getpid()
         pid_list += [pid]
-    else:
-        break
 
 if pid > 0:
     # ONLY CHILDREN RUN HERE
@@ -51,7 +49,7 @@ if pid > 0:
             score += reward
             observation = observation_
             output = open('./outputs/'+str(pid)+'.txt', 'w')
-            output.write(score)
+            output.write(str(score))
             output.close()
 
         # print('episode ', i, 'score %.1f' % score, 'avg_score %.1f' % avg_score)
