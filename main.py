@@ -26,6 +26,8 @@ for _ in range(CHILD_COUNT):
         n = os.fork()
         pid = os.getpid()
         pid_list += [pid]
+    else:
+        break
 
 if pid > 0:
     # ONLY CHILDREN RUN HERE
